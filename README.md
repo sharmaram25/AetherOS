@@ -128,8 +128,6 @@ I build digital experiences that operate at the intersection of rigorous enginee
 
 **Connect & Explore:**
 - [GitHub Profile](https://github.com/sharmaram25)
-- [LinkedIn](#) *(Add your link)*
-
 </div>
 
 ---
