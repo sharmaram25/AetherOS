@@ -17,6 +17,12 @@
   It combines fluid physics, 3D atmospherics, and local intelligence to create a workspace that feels alive.
 </p>
 
+<p align="center">
+  <a href="https://aether-webos.netlify.app/">
+    <img src="https://img.shields.io/badge/LIVE_DEMO-Launch_AetherOS-00C853?style=for-the-badge&logo=rocket&logoColor=white&labelColor=1a1a1a" alt="Live Demo" height="45" />
+  </a>
+</p>
+
 </div>
 
 ---
