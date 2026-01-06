@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" width="100%" alt="AetherOS Banner" />
+    <img src="public/assets/Desktop.png" width="100%" alt="AetherOS Desktop" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
     <br/>
     <br/>
 
@@ -13,122 +13,105 @@
 [![Framer Motion](https://img.shields.io/badge/Framer_Motion-Animations-0055FF?logo=framer&logoColor=white)](https://www.framer.com/motion/)
 
 <p align="center">
-  <b>AetherOS</b> is a conceptual web operating system exploring the future of interfaces.<br/>
-  It transforms the browser into a spatial computing environment with fluid physics, local intelligence, and a fully functional window manager.
+  <b>AetherOS</b> is a next-generation web interface that redefines the browser as a spatial operating system.<br/>
+  It combines fluid physics, 3D atmospherics, and local intelligence to create a workspace that feels alive.
 </p>
 
 </div>
 
 ---
 
-## 🌌 The Experience
+## 🌌 The Vision
 
-Most web apps are isolated silos. **AetherOS** brings them together into a cohesive workspace. It's not just a UI kit—it's a runtime environment that simulates a desktop experience entirely in the browser.
+The web has evolved, but our interfaces often remain static. **AetherOS** breaks the mold by treating the browser tab as a full-fledged runtime environment. It’s not just a collection of components—it's a cohesive digital space where applications float, snap, and interact with tactile precision.
 
-| **Desktop Environment** | **App Ecosystem** |
+This project is an exploration of **"OS-in-browser"** architecture, demonstrating how modern web technologies can replicate—and even exceed—the feel of native desktop environments.
+
+---
+
+## 💎 Features & capabilities
+
+### 🖥️ Spatial Desktop Environment
+- **Window Management**: A robust windowing system with z-index stacking, minimization states, and drag-and-snap mechanics.
+- **Global File System**: A virtual FS implementation that persists data across sessions using IndexedDB/LocalStorage.
+- **Task Management**: A responsive dock and system tray that handle process switching and background tasks.
+
+### 🎨 Visual & Motion Engine
+- **Fluid Physics**: Every interaction—opening an app, dragging a window, hovering icons—is driven by spring physics (via Framer Motion) rather than linear CSS transitions.
+- **3D Integration**: The desktop background is a live 3D scene (React Three Fiber) that reacts to cursor movement and system themes.
+- **Glassmorphism System**: A dynamic theming engine that handles blurs, transparency, and light/dark modes systematically.
+
+### 🛠️ Built-in Ecosystem
+A suite of native-feeling applications designed to showcase different architectural patterns:
+- **Cortex**: An intelligent assistant interface for natural language tasks.
+- **Scribe**: A block-based rich text editor for distraction-free writing.
+- **Lens**: A high-performance media viewer with zoom and pan capabilities.
+- **Terminal**: A functional command-line emulator with a custom parser.
+- **System Control**: A comprehensive settings panel for deep OS configuration.
+
+---
+
+## 🧠 Engineering Architecture
+
+AetherOS is built on a "Kernel-Shell-App" architecture pattern to separate concerns and ensure scalability.
+
+### 1. The Kernel (State & Logic)
+The core logic resides in decoupled **Zustand** stores:
+- `useWindowManager`: Orchestrates process lifecycles and window states.
+- `useFileSystem`: Manages the virtual file tree and read/write operations.
+- `useTheme`: Controls the global design system tokens.
+
+### 2. The Shell (Visuals)
+The presentation layer creates the "OS Illusion" using modular primitives:
+- **WindowFrame HOC**: Wraps any standard React component to give it OS superpowers (header bars, resize handles).
+- **Portal Manager**: Handles overlays, context menus, and notifications outside the DOM hierarchy of windows.
+
+### 3. The App Registry
+Applications are lazy-loaded modules. The `AppRegistry` maps unique Bundle IDs to their imports, ensuring the initial load is lightweight.
+
+---
+
+## 📸 Gallery
+
+| **App Launcher** | **File Explorer** |
 |:---:|:---:|
-| <img src="public/assets/Desktop.png" width="400" alt="Desktop UI" /> | <img src="public/assets/applications.png" width="400" alt="App Launchpad" /> |
-
-### 💎 Key Features
-
-- **Spatial Window Manager**: Complete with focus handling, z-index layering, minimizing, and snapping.
-- **Fluid Motion Engine**: Powered by **Framer Motion**, every interaction supports spring physics for a tactile feel.
-- **3D Atmosphere**: A specialized renderer using **React Three Fiber** to generate dynamic, interactive wallpapers and widgets.
-- **Local-First Architecture**: Files, settings, and state are persisted locally, respecting user privacy by default.
-- **System Services**: Built-in background workers, notification centers, and system trays.
-
----
-
-## 🧠 Architecture Deep Dive
-
-AetherOS is engineered to demonstrate complex state management and performance patterns in React.
-
-### 1. The Kernel (State Management)
-The OS state is managed via **Zustand** stores that act as the single source of truth.
-- `useWindowManager`: Handles the lifecycle of processes (open, close, focus, minimize).
-- `useFileSystem`: A virtual file system structure abstraction.
-- `useTheme`: Manages systematic design tokens (Glassmorphism, Dark/Light modes).
-
-### 2. The Shell (Visual Layer)
-The UI is composed of decoupled "OS Primitives":
-- **Dock**: A reflexive launcher that responds to mouse proximity.
-- **WindowFrame**: A Higher-Order Component (HOC) that wraps standard React components to give them OS capabilities (dragging, residing).
-- **Overlays**: System-wide notifications and context menus managed via React Portals.
-
-### 3. The Applications
-Apps are treated as independent modules. The `appRegistry` maps app IDs to their lazily loaded components, ensuring the initial bundle size remains small.
-
-#### 🛠️ Included Apps
-| App | Description | Tech |
-| :--- | :--- | :--- |
-| **Cortex** | AI Assistant interface | `WebLLM` / Streaming APIs |
-| **Scribe** | Rich text editor | `contentEditable` / specialized hooks |
-| **Lens** | Media gallery & preview | `Canvas` / Image processing |
-| **Terminal** | Command line simulator | Custom parser |
-| **Settings** | System configuration | Deep state integration |
-
----
-
-## 📸 Visual Tour
-
-<details open>
-<summary><b>File Manager</b> — <i>Browse virtual and local assets</i></summary>
-<br/>
-<img src="public/assets/File%20Manager.png" width="800" alt="File Manager" />
-</details>
-
-<br/>
+| <img src="public/assets/applications.png" width="100%" alt="Launcher" /> | <img src="public/assets/File%20Manager.png" width="100%" alt="Explorer" /> |
 
 <details>
-<summary><b>System Settings</b> — <i>Personalization and Control</i></summary>
-<br/>
-<img src="public/assets/settings.png" width="800" alt="Settings Panel" />
-</details>
-
+<summary><b>View More Screenshots</b></summary>
 <br/>
 
-<details>
-<summary><b>Camera & Media</b> — <i>Hardware integration</i></summary>
-<br/>
-<img src="public/assets/camera.png" width="800" alt="Camera App" />
+**Settings Panel**
+<img src="public/assets/settings.png" width="100%" alt="Settings" />
+
+**Camera Application**
+<img src="public/assets/camera.png" width="100%" alt="Camera" />
+
 </details>
 
 ---
 
 ## ⚡ Quick Start
 
-Experience the OS locally in minutes.
+Boot up AetherOS on your local machine.
 
 **Prerequisites:** Node.js v18+
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/aetheros.git
+git clone https://github.com/sharmaram25/AetherOS.git
 
-# 2. Enter the directory
-cd aetheros
+# 2. Navigate to project root
+cd AetherOS
 
 # 3. Install dependencies
 npm install
 
-# 4. Boot the OS
+# 4. Start the OS
 npm run dev
 ```
 
-> The system will boot at `http://localhost:3000`
-
----
-
-## 🏗️ Building for Production
-
-AetherOS compiles to a static single-page application (SPA).
-
-```bash
-npm run build
-# Output located in /dist
-```
-
-You can deploy the `./dist` folder to **Vercel**, **Netlify**, or **GitHub Pages**.
+Visit `http://localhost:3000` to enter the environment.
 
 ---
 
@@ -141,7 +124,11 @@ You can deploy the `./dist` folder to **Vercel**, **Netlify**, or **GitHub Pages
 
 > *"Working to solve problems one code at a time."*
 
-I build digital experiences that blend performance with artistic intent. AetherOS is a showcase of what's possible when strict engineering meets creative freedom.
+I build digital experiences that operate at the intersection of rigorous engineering and creative design. AetherOS is my sandbox for testing the limits of what the web can do.
+
+**Connect & Explore:**
+- [GitHub Profile](https://github.com/sharmaram25)
+- [LinkedIn](#) *(Add your link)*
 
 </div>
 
