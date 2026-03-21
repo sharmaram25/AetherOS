@@ -5,8 +5,11 @@ import { FolderPlus, Image, RefreshCw, Trash2, Share2, FileText } from 'lucide-r
 import { useWindowManager } from '../../store/useWindowManager';
 import { useFileSystem } from '../../store/useFileSystem';
 import { useNotificationStore } from './NotificationCenter';
+import { MENU_TRANSITION } from '../../utils/MotionConfig';
 
 export const ContextMenu = () => {
+  const MENU_WIDTH = 220;
+  const MENU_HEIGHT = 260;
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [contextType, setContextType] = useState<'desktop' | 'file'>('desktop');
@@ -14,7 +17,7 @@ export const ContextMenu = () => {
 
   const { openWindow } = useWindowManager();
   const { addNotification } = useNotificationStore();
-  const { mkdir } = useFileSystem();
+  const { mkdir, deleteFile } = useFileSystem();
 
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
@@ -31,7 +34,9 @@ export const ContextMenu = () => {
         setTargetFile(null);
       }
 
-      setPosition({ x: e.clientX, y: e.clientY });
+      const x = Math.min(e.clientX, window.innerWidth - MENU_WIDTH);
+      const y = Math.min(e.clientY, window.innerHeight - MENU_HEIGHT);
+      setPosition({ x: Math.max(8, x), y: Math.max(8, y) });
       setVisible(true);
     };
 
@@ -46,11 +51,11 @@ export const ContextMenu = () => {
     };
   }, []);
 
-  const handleAction = (action: string) => {
+  const handleAction = async (action: string) => {
     setVisible(false);
     switch (action) {
       case 'new-folder':
-        mkdir(`/home/user/New Folder ${Math.floor(Math.random() * 100)}`);
+        await mkdir(`/home/user/New Folder ${Math.floor(Math.random() * 100)}`);
         addNotification("System", "New folder created on Desktop", "success");
         break;
       case 'change-wallpaper':
@@ -63,7 +68,10 @@ export const ContextMenu = () => {
         if (targetFile) openWindow('aether-text', 'Aether Text'); // simplified for demo
         break;
       case 'delete':
-        if (targetFile) addNotification("Filesystem", `Deleted ${targetFile}`, "warning");
+        if (targetFile) {
+          await deleteFile(targetFile);
+          addNotification("Filesystem", `Deleted ${targetFile}`, "warning");
+        }
         break;
       case 'share':
         openWindow('wormhole', 'Wormhole');
@@ -78,8 +86,8 @@ export const ContextMenu = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.1 }}
-          className="fixed z-[10002] bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl py-1 min-w-[200px]"
+          transition={MENU_TRANSITION}
+          className="fixed z-[10002] bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-1 min-w-[200px]"
           style={{ top: position.y, left: position.x }}
         >
           {contextType === 'desktop' ? (

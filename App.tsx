@@ -33,6 +33,28 @@ class ThreeErrorBoundary extends React.Component<{children: React.ReactNode}, {h
   }
 }
 
+class UIErrorBoundary extends React.Component<{children: React.ReactNode; resetKey: string}, {hasError: boolean}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("UI Layer Error:", error, errorInfo);
+  }
+  componentDidUpdate(prevProps: { resetKey: string }) {
+    if (prevProps.resetKey !== this.props.resetKey && this.state.hasError) {
+      this.setState({ hasError: false });
+    }
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 const App = () => {
   const { init } = useFileSystem();
   const [isNexusOpen, setIsNexusOpen] = useState(false);
@@ -72,7 +94,9 @@ const App = () => {
       <Dock onNexusClick={() => setIsNexusOpen(true)} />
       
       {/* Overlays */}
-      <Nexus isOpen={isNexusOpen} onClose={() => setIsNexusOpen(false)} />
+      <UIErrorBoundary resetKey={isNexusOpen ? 'open' : 'closed'}>
+        <Nexus isOpen={isNexusOpen} onClose={() => setIsNexusOpen(false)} />
+      </UIErrorBoundary>
       <ContextMenu />
       <NotificationCenter />
     </div>

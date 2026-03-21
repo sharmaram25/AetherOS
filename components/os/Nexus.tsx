@@ -1,10 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Search, File } from 'lucide-react';
 import { useWindowManager } from '../../store/useWindowManager';
 import { useFileSystem } from '../../store/useFileSystem';
 import { APP_REGISTRY } from '../../utils/appRegistry';
-import { AppId } from '../../types';
+import { AppId, FileType } from '../../types';
+import { motion } from 'framer-motion';
+import { MENU_TRANSITION } from '../../utils/MotionConfig';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { getAppIdForExtension } from '../../utils/appRegistry';
 
 interface NexusProps {
   isOpen: boolean;
@@ -15,6 +19,7 @@ export const Nexus: React.FC<NexusProps> = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const { openWindow } = useWindowManager();
   const { files } = useFileSystem();
+  const debouncedQuery = useDebouncedValue(query, 180);
 
   useEffect(() => {
     if (isOpen) setQuery('');
@@ -27,15 +32,40 @@ export const Nexus: React.FC<NexusProps> = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  const filteredFiles = Object.values(files).filter(f => 
-    f.name.toLowerCase().includes(query.toLowerCase()) && f.type === 'FILE'
-  ).slice(0, 5);
+  const apps = useMemo(() => Object.values(APP_REGISTRY), []);
+  const filteredApps = useMemo(
+    () => apps.filter((app) => app.title.toLowerCase().includes(debouncedQuery.toLowerCase())),
+    [apps, debouncedQuery]
+  );
 
-  const apps = Object.values(APP_REGISTRY);
+  const filteredFiles = useMemo(
+    () =>
+      Object.values(files)
+        .filter((f) => f.name.toLowerCase().includes(debouncedQuery.toLowerCase()) && f.type === FileType.FILE)
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .slice(0, 20),
+    [files, debouncedQuery]
+  );
+
+  const handleOpenFile = (filePath: string, fileName: string) => {
+    const appId = getAppIdForExtension(fileName);
+    openWindow(appId, fileName, { filePath });
+    onClose();
+  };
 
   return (
-    <div className="absolute inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div 
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={MENU_TRANSITION}
+      className="absolute inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 12, opacity: 0.9, scale: 0.98 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={MENU_TRANSITION}
         className="w-[600px] bg-gray-900/80 backdrop-blur-2xl border border-white/10 rounded-xl shadow-2xl overflow-hidden flex flex-col"
         onClick={e => e.stopPropagation()}
       >
@@ -55,14 +85,14 @@ export const Nexus: React.FC<NexusProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <div className="p-4 max-h-[400px] overflow-y-auto">
+          <div className="p-4 max-h-[400px] overflow-y-auto">
           {query === '' && (
              <div className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2 px-2">Applications</div>
           )}
 
           {/* Apps Grid */}
-          <div className="grid grid-cols-2 gap-2 mb-4">
-             {apps.filter(a => a.title.toLowerCase().includes(query.toLowerCase())).map(app => (
+           <div className="grid grid-cols-2 gap-2 mb-4 max-h-[230px] overflow-y-auto">
+             {filteredApps.map(app => (
                 <button 
                     key={app.id}
                     onClick={() => handleLaunch(app.id)}
@@ -82,9 +112,9 @@ export const Nexus: React.FC<NexusProps> = ({ isOpen, onClose }) => {
           {filteredFiles.length > 0 && (
             <>
                 <div className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2 px-2 mt-4">Files</div>
-                <div className="space-y-1">
+                  <div className="space-y-1 max-h-[120px] overflow-y-auto">
                     {filteredFiles.map(file => (
-                        <button key={file.path} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-3 group">
+                      <button key={file.path} onClick={() => handleOpenFile(file.path, file.name)} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-3 group">
                              <File size={14} className="text-gray-500 group-hover:text-gray-300" />
                              <span className="text-sm text-gray-400 group-hover:text-white truncate">{file.name}</span>
                              <span className="ml-auto text-xs text-gray-600 font-mono">{file.path}</span>
@@ -103,7 +133,7 @@ export const Nexus: React.FC<NexusProps> = ({ isOpen, onClose }) => {
                  <span>Select <span className="text-white/50">↵</span></span>
              </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

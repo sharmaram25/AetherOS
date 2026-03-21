@@ -23,7 +23,7 @@ class CortexService {
           properties: {
             appId: {
               type: "string",
-              enum: ["aether-text", "system-monitor", "terminal", "wormhole", "image-filter"],
+              enum: ["aether-text", "system-monitor", "terminal", "wormhole", "image-filter", "files", "chronos", "abacus", "lens", "cortex", "epoch", "settings", "scribe", "grid"],
               description: "The ID of the app to launch"
             }
           },
@@ -43,6 +43,35 @@ class CortexService {
             content: { type: "string", description: "The content of the file" }
           },
           required: ["path", "content"]
+        }
+      }
+    },
+    {
+      type: "function",
+      function: {
+        name: "list_files",
+        description: "List files from a directory in the virtual file system",
+        parameters: {
+          type: "object",
+          properties: {
+            path: { type: "string", description: "Directory path (e.g., /home/user/documents)" },
+            limit: { type: "number", description: "Maximum number of entries" }
+          },
+          required: ["path"]
+        }
+      }
+    },
+    {
+      type: "function",
+      function: {
+        name: "read_file",
+        description: "Read text content from a file",
+        parameters: {
+          type: "object",
+          properties: {
+            path: { type: "string", description: "The full file path" }
+          },
+          required: ["path"]
         }
       }
     }
@@ -83,17 +112,34 @@ class CortexService {
       
       // Handle Function Calling
       if (choice.message.tool_calls) {
+        const toolResults: string[] = [];
+
         for (const call of choice.message.tool_calls) {
           const args = JSON.parse(call.function.arguments);
-          if (call.function.name === 'open_app') {
-            context.wm.openWindow(args.appId, args.appId.toUpperCase());
-            return `Opening ${args.appId}...`;
-          }
-          if (call.function.name === 'create_file') {
-            await context.fs.writeFile(args.path, args.content);
-            return `Created file at ${args.path}`;
+          try {
+            if (call.function.name === 'open_app') {
+              context.wm.openWindow(args.appId, args.appId.toUpperCase());
+              toolResults.push(`Opening ${args.appId}...`);
+            }
+            if (call.function.name === 'create_file') {
+              await context.fs.writeFile(args.path, args.content);
+              toolResults.push(`Created file at ${args.path}`);
+            }
+            if (call.function.name === 'list_files') {
+              const entries = context.fs.readdir(args.path).slice(0, args.limit || 20);
+              if (entries.length === 0) toolResults.push(`No files in ${args.path}`);
+              else toolResults.push(`Files in ${args.path}: ${entries.map((entry: any) => entry.name).join(', ')}`);
+            }
+            if (call.function.name === 'read_file') {
+              const content = await context.fs.readFile(args.path);
+              toolResults.push(`Read ${args.path}: ${content.slice(0, 280)}`);
+            }
+          } catch (e) {
+            toolResults.push(`Tool ${call.function.name} failed.`);
           }
         }
+
+        if (toolResults.length > 0) return toolResults.join('\n');
       }
 
       return choice.message.content || "I didn't understand that.";
@@ -114,6 +160,11 @@ class CortexService {
       context.wm.openWindow('aether-text', 'Aether Text');
       return "I've opened the text editor for you.";
     }
+
+    if (lower.includes('open') && (lower.includes('files') || lower.includes('file manager'))) {
+      context.wm.openWindow('files', 'Aether Files');
+      return "Opening Aether Files.";
+    }
     
     if (lower.includes('monitor') || lower.includes('system')) {
         context.wm.openWindow('system-monitor', 'System Monitor');
@@ -123,8 +174,14 @@ class CortexService {
     if (lower.includes('write') && lower.includes('poem')) {
         const poem = "In wires deep where data flows,\nA digital wind softly blows.\nAether shines in pixel light,\nA guide through the electric night.";
         await context.fs.writeFile('/home/user/documents/cortex_poem.txt', poem);
-        context.wm.openWindow('aether-text', 'Aether Text');
-        return "I wrote a poem and saved it to /home/user/documents/cortex_poem.txt";
+        context.wm.openWindow('files', 'Aether Files');
+        return "I wrote a poem and saved it to /home/user/documents/cortex_poem.txt. You can open it from Aether Files.";
+    }
+
+    if (lower.includes('list') && lower.includes('documents')) {
+      const entries = context.fs.readdir('/home/user/documents');
+      if (!entries.length) return "Your documents folder is empty.";
+      return `Documents: ${entries.map((entry: any) => entry.name).join(', ')}`;
     }
 
     return "Cortex (Safe Mode): I can help you open apps or write files. Try 'Open text editor' or 'Write a poem'. (WebGPU Model not loaded)";

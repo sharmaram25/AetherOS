@@ -2,6 +2,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useFileSystem } from '../../store/useFileSystem';
 import { useWindowManager } from '../../store/useWindowManager';
+import { getAppIdForExtension } from '../../utils/appRegistry';
+import { FileType } from '../../types';
 
 const INITIAL_WELCOME = [
   "AetherOS Terminal [Version 1.0.2]",
@@ -19,6 +21,8 @@ export const Terminal = () => {
   const [cwd, setCwd] = useState('/home/user');
   const [input, setInput] = useState('');
   const [isReplMode, setIsReplMode] = useState(false);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,6 +64,10 @@ export const Terminal = () => {
     }
 
     const newHistory = [...history, `${isReplMode ? '>>' : cwd + ' $'} ${cmd}`];
+    if (cmd.trim()) {
+      setCommandHistory((prev) => [...prev, cmd]);
+      setHistoryIndex(-1);
+    }
 
     if (isReplMode) {
       if (cmd === 'exit') {
@@ -67,13 +75,14 @@ export const Terminal = () => {
         setHistory([...newHistory, "Exited REPL mode."]);
       } else {
         try {
-          // Dangerous: Eval in context
-          // Expose APIs to the REPL
-          (window as any).os = {
-            fs: { files, readFile, writeFile },
-            wm: windowManager
+          const sandbox = {
+            cwd,
+            files,
+            fileCount: Object.keys(files).length,
+            windowCount: Object.keys(windowManager.windows).length,
+            now: () => new Date().toISOString()
           };
-          const result = eval(cmd);
+          const result = Function('sandbox', `"use strict"; return (${cmd});`)(sandbox);
           setHistory([...newHistory, `<- ${String(result)}`]);
         } catch (e: any) {
           setHistory([...newHistory, `Error: ${e.message}`]);
@@ -93,12 +102,17 @@ export const Terminal = () => {
               "Available commands:",
               "  ls           List directory contents",
               "  cd [dir]     Change directory",
+              "  pwd          Print current directory",
               "  mkdir [dir]  Create directory",
               "  touch [file] Create empty file",
               "  rm [file]    Remove file",
+              "  cat [file]   Print file content",
+              "  open [file]  Open file in matching app",
+              "  date         Current system date/time",
+              "  whoami       Show current user",
               "  echo [text]  Print text (supports > file.txt)",
               "  clear        Clear screen",
-              "  js           Enter JavaScript REPL mode"
+              "  js           Enter sandboxed JS REPL mode"
             ]);
             break;
 
@@ -135,6 +149,10 @@ export const Terminal = () => {
             break;
           }
 
+          case 'pwd':
+            setHistory([...newHistory, cwd]);
+            break;
+
           case 'mkdir':
             if (!arg1) throw new Error("missing operand");
             await mkdir(resolvePath(arg1));
@@ -152,6 +170,33 @@ export const Terminal = () => {
              await deleteFile(resolvePath(arg1));
              setHistory(newHistory);
              break;
+
+          case 'cat': {
+            if (!arg1) throw new Error("missing operand");
+            const data = await readFile(resolvePath(arg1));
+            setHistory([...newHistory, ...(data ? data.split('\n') : [''])]);
+            break;
+          }
+
+          case 'open': {
+            if (!arg1) throw new Error("missing operand");
+            const target = resolvePath(arg1);
+            const fileNode = files[target];
+            if (!fileNode) throw new Error("file not found");
+            if (fileNode.type !== FileType.FILE) throw new Error("target is not a file");
+            const appId = getAppIdForExtension(fileNode.name);
+            windowManager.openWindow(appId, fileNode.name, { filePath: fileNode.path });
+            setHistory(newHistory);
+            break;
+          }
+
+          case 'date':
+            setHistory([...newHistory, new Date().toString()]);
+            break;
+
+          case 'whoami':
+            setHistory([...newHistory, 'user']);
+            break;
 
           case 'echo': {
             // Handle redirection: echo "hello" > file.txt
@@ -171,7 +216,7 @@ export const Terminal = () => {
 
           case 'js':
             setIsReplMode(true);
-            setHistory([...newHistory, "Entering JS REPL Mode. Global 'os' object available. Type 'exit' to quit."]);
+            setHistory([...newHistory, "Entering sandboxed JS REPL mode. Use 'exit' to quit."]);
             break;
 
           default:
@@ -204,6 +249,27 @@ export const Terminal = () => {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => {
             if (e.key === 'Enter') handleCommand(input);
+            if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              setHistoryIndex((prev) => {
+                const nextIndex = prev === -1 ? commandHistory.length - 1 : Math.max(0, prev - 1);
+                setInput(commandHistory[nextIndex] || '');
+                return nextIndex;
+              });
+            }
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setHistoryIndex((prev) => {
+                if (prev === -1) return -1;
+                const nextIndex = prev + 1;
+                if (nextIndex >= commandHistory.length) {
+                  setInput('');
+                  return -1;
+                }
+                setInput(commandHistory[nextIndex] || '');
+                return nextIndex;
+              });
+            }
           }}
           className="flex-1 bg-transparent focus:outline-none text-gray-100"
           autoComplete="off"

@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { create } from 'zustand';
 import { X, Info, AlertTriangle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MENU_TRANSITION } from '../../utils/MotionConfig';
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';
 
@@ -42,11 +43,12 @@ export const NotificationCenter = () => {
         {notifications.map((n) => (
           <motion.div
             key={n.id}
-            initial={{ opacity: 0, x: 50, scale: 0.9 }}
+            initial={{ opacity: 0, x: 32, scale: 0.96 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 50, scale: 0.9 }}
+            exit={{ opacity: 0, x: 20, scale: 0.96 }}
+            transition={MENU_TRANSITION}
             layout
-            className="pointer-events-auto w-80 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl p-4 flex gap-3 relative overflow-hidden group"
+            className="pointer-events-auto w-80 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl p-4 flex gap-3 relative overflow-hidden group hover:border-white/20"
           >
             {/* Status Line */}
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${

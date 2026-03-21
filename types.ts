@@ -1,7 +1,7 @@
 
 import { ReactNode } from 'react';
 
-export type AppId = 'aether-text' | 'system-monitor' | 'terminal' | 'wormhole' | 'image-filter' | 'cortex' | 'settings' | 'files' | 'abacus' | 'chronos' | 'lens' | 'epoch' | 'scribe' | 'grid' | 'slides';
+export type AppId = 'aether-text' | 'system-monitor' | 'terminal' | 'wormhole' | 'image-filter' | 'cortex' | 'settings' | 'files' | 'abacus' | 'chronos' | 'lens' | 'epoch' | 'scribe' | 'grid';
 
 export interface AppProps {
   windowId: string;

@@ -108,35 +108,70 @@ export const useFileSystem = create<FileSystemState>((set, get) => ({
   },
 
   writeFile: async (path: string, content: string) => {
+    const existingFiles = get().files;
+    const pathSegments = path.split('/').filter(Boolean);
+    const parentPaths = pathSegments.slice(0, -1).map((_, index) => '/' + pathSegments.slice(0, index + 1).join('/'));
+
+    const createdDirs: FileNode[] = [];
+    for (const dirPath of parentPaths) {
+      if (!existingFiles[dirPath]) {
+        createdDirs.push({
+          name: dirPath.split('/').pop() || '',
+          type: FileType.DIRECTORY,
+          path: dirPath,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        });
+      }
+    }
+
     const name = path.split('/').pop() || 'untitled';
     const newNode: FileNode = {
       name,
       type: FileType.FILE,
       path,
       content,
-      createdAt: get().files[path]?.createdAt || Date.now(),
+      createdAt: existingFiles[path]?.createdAt || Date.now(),
       updatedAt: Date.now(),
     };
 
     // Optimistic UI Update
-    set({ files: { ...get().files, [path]: newNode } });
+    const mergedFiles = { ...existingFiles };
+    for (const dirNode of createdDirs) {
+      mergedFiles[dirNode.path] = dirNode;
+    }
+    mergedFiles[path] = newNode;
+    set({ files: mergedFiles });
     
     // Async Worker Write
+    await Promise.all(createdDirs.map((dirNode) => requestWorker('write', { key: dirNode.path, value: dirNode })));
     await requestWorker('write', { key: path, value: newNode });
   },
 
   mkdir: async (path: string) => {
-    const name = path.split('/').pop() || 'untitled';
-    const newNode: FileNode = {
-      name,
-      type: FileType.DIRECTORY,
-      path,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-    
-    set({ files: { ...get().files, [path]: newNode } });
-    await requestWorker('write', { key: path, value: newNode });
+    const existingFiles = get().files;
+    const pathSegments = path.split('/').filter(Boolean);
+    const directoryPaths = pathSegments.map((_, index) => '/' + pathSegments.slice(0, index + 1).join('/'));
+
+    const missingDirectories: FileNode[] = directoryPaths
+      .filter((dirPath) => !existingFiles[dirPath])
+      .map((dirPath) => ({
+        name: dirPath.split('/').pop() || 'untitled',
+        type: FileType.DIRECTORY,
+        path: dirPath,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }));
+
+    if (missingDirectories.length === 0) return;
+
+    const mergedFiles = { ...existingFiles };
+    for (const dirNode of missingDirectories) {
+      mergedFiles[dirNode.path] = dirNode;
+    }
+
+    set({ files: mergedFiles });
+    await Promise.all(missingDirectories.map((dirNode) => requestWorker('write', { key: dirNode.path, value: dirNode })));
   },
 
   readdir: (path: string) => {
@@ -152,9 +187,20 @@ export const useFileSystem = create<FileSystemState>((set, get) => ({
 
   deleteFile: async (path: string) => {
     const { files } = get();
+    const target = files[path];
+    if (!target) return;
+
+    const pathsToDelete = Object.keys(files).filter((candidatePath) => {
+      if (candidatePath === path) return true;
+      return target.type === FileType.DIRECTORY && candidatePath.startsWith(path + '/');
+    });
+
     const newFiles = { ...files };
-    delete newFiles[path];
+    for (const filePath of pathsToDelete) {
+      delete newFiles[filePath];
+    }
     set({ files: newFiles });
-    await requestWorker('delete', { key: path });
+
+    await Promise.all(pathsToDelete.map((filePath) => requestWorker('delete', { key: filePath })));
   }
 }));

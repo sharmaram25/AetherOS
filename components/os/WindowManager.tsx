@@ -5,7 +5,8 @@ import { WindowFrame } from './WindowFrame';
 import { APP_REGISTRY } from '../../utils/appRegistry';
 
 export const WindowManager = () => {
-  const { windows } = useWindowManager();
+  const windows = useWindowManager((state) => state.windows);
+  const activeWindowId = useWindowManager((state) => state.activeWindowId);
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -24,7 +25,7 @@ export const WindowManager = () => {
                    {/* Error Boundary could wrap here */}
                    <AppComponent 
                         windowId={win.id} 
-                        isFocused={false} // Managed by WM focusWindow logic in Frame
+                        isFocused={activeWindowId === win.id}
                         initialData={win.data}
                    />
                </Suspense>

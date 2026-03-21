@@ -12,6 +12,7 @@ export const Lens: React.FC<AppProps> = () => {
   const [captured, setCaptured] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [recentPhotos, setRecentPhotos] = useState<string[]>([]);
+    const [isMirrored, setIsMirrored] = useState(true);
   const { writeFile } = useFileSystem();
 
   useEffect(() => {
@@ -60,7 +61,15 @@ export const Lens: React.FC<AppProps> = () => {
 
     // Apply the current filter to the context before drawing
     ctx.filter = filter;
-    ctx.drawImage(videoRef.current, 0, 0);
+        if (isMirrored) {
+            ctx.save();
+            ctx.translate(canvasRef.current.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(videoRef.current, 0, 0);
+            ctx.restore();
+        } else {
+            ctx.drawImage(videoRef.current, 0, 0);
+        }
     
     const dataUrl = canvasRef.current.toDataURL('image/jpeg', 0.9);
     setCaptured(dataUrl);
@@ -117,7 +126,7 @@ export const Lens: React.FC<AppProps> = () => {
                     playsInline 
                     muted
                     className="w-full h-full object-cover transition-all duration-300"
-                    style={{ filter: filter }}
+                    style={{ filter: filter, transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                 />
             ) : (
                 <img src={captured} className="w-full h-full object-contain" />
@@ -135,6 +144,12 @@ export const Lens: React.FC<AppProps> = () => {
                             {f.name}
                         </button>
                     ))}
+                                        <button
+                                            onClick={() => setIsMirrored((v) => !v)}
+                                            className="text-[10px] font-medium whitespace-nowrap text-white/70 hover:text-white"
+                                        >
+                                            {isMirrored ? 'Mirror Off' : 'Mirror On'}
+                                        </button>
                 </div>
             )}
         </div>

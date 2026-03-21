@@ -1,8 +1,9 @@
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Vector2 } from 'three';
 import * as THREE from 'three';
+import { useSettingsStore } from '../../stores/settingsStore';
 
 const VertexShader = `
 varying vec2 vUv;
@@ -74,19 +75,21 @@ const ShaderPlane = () => {
   useFrame((state) => {
     if (meshRef.current) {
       const { clock, pointer } = state;
+      const shaderMaterial = meshRef.current.material as THREE.ShaderMaterial;
       // Use shader material uniforms
-      (meshRef.current.material as THREE.ShaderMaterial).uniforms.uTime.value = clock.getElapsedTime();
+      shaderMaterial.uniforms.uTime.value = clock.getElapsedTime();
       
       // Interpolate mouse position for smoothness
-      const currentX = (meshRef.current.material as THREE.ShaderMaterial).uniforms.uMouse.value.x;
-      const currentY = (meshRef.current.material as THREE.ShaderMaterial).uniforms.uMouse.value.y;
+      const currentX = shaderMaterial.uniforms.uMouse.value.x;
+      const currentY = shaderMaterial.uniforms.uMouse.value.y;
       
       // Pointer is -1 to 1, map to 0 to 1
       const targetX = (pointer.x + 1) / 2;
       const targetY = (pointer.y + 1) / 2;
 
-      (meshRef.current.material as THREE.ShaderMaterial).uniforms.uMouse.value.x = THREE.MathUtils.lerp(currentX, targetX, 0.05);
-      (meshRef.current.material as THREE.ShaderMaterial).uniforms.uMouse.value.y = THREE.MathUtils.lerp(currentY, targetY, 0.05);
+      shaderMaterial.uniforms.uMouse.value.x = THREE.MathUtils.lerp(currentX, targetX, 0.05);
+      shaderMaterial.uniforms.uMouse.value.y = THREE.MathUtils.lerp(currentY, targetY, 0.05);
+      shaderMaterial.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
     }
   });
 
@@ -103,12 +106,27 @@ const ShaderPlane = () => {
 };
 
 export const WallpaperEngine = () => {
+  const { reducedMotion } = useSettingsStore();
+  const [maxDpr, setMaxDpr] = useState(1.5);
+
+  useEffect(() => {
+    const updateDpr = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const capped = reducedMotion ? 1.25 : 1.75;
+      setMaxDpr(Math.max(1, Math.min(capped, dpr)));
+    };
+
+    updateDpr();
+    window.addEventListener('resize', updateDpr);
+    return () => window.removeEventListener('resize', updateDpr);
+  }, [reducedMotion]);
+
   return (
     <div className="absolute inset-0 -z-50">
       <Canvas 
         camera={{ position: [0, 0, 1] }} 
-        dpr={[1, 1.5]} // Optimize pixel ratio for battery life
-        gl={{ powerPreference: "high-performance", alpha: false }}
+        dpr={[1, maxDpr]}
+        gl={{ powerPreference: "low-power", alpha: false, antialias: true }}
       >
         <ShaderPlane />
       </Canvas>

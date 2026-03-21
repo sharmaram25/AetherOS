@@ -91,21 +91,24 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState, children 
         transition={SPRING_TRANSITION}
         initial={false}
         className={`absolute flex flex-col overflow-hidden transition-shadow duration-300
-          ${isActive ? 'shadow-[0_0_50px_rgba(0,0,0,0.4)] z-50' : 'shadow-2xl z-0 opacity-95 grayscale-[0.3]'}
-          ${isMaximized ? '!transform-none !inset-0 !w-full !h-full !rounded-none' : 'rounded-lg border border-white/10'}
+          ${isActive ? 'shadow-[0_0_50px_rgba(0,0,0,0.4)] z-50' : 'shadow-2xl z-0 opacity-95 grayscale-[0.2]'}
+          ${isMaximized ? '!transform-none !inset-0 !w-full !h-full !rounded-none border border-transparent' : 'rounded-lg border border-white/10'}
         `}
         style={{ 
             zIndex: windowState.zIndex,
             backgroundColor: 'rgba(15, 23, 42, 0.75)',
             backdropFilter: `blur(${blurStrength}px)`,
+            boxShadow: isActive ? `0 0 0 1px ${accentColor}33, 0 0 50px rgba(0,0,0,0.4)` : undefined,
         }}
         ref={windowRef}
       >
+        {isActive && <div className="h-[2px] w-full" style={{ backgroundColor: accentColor }} />}
+
         {/* Transparent Header */}
         <div
           onMouseDown={handleMouseDown}
           onDoubleClick={() => isMaximized ? restoreWindow(windowState.id) : maximizeWindow(windowState.id)}
-          className="h-10 flex items-center justify-between px-4 select-none cursor-default bg-white/5"
+          className={`h-10 flex items-center justify-between px-4 select-none cursor-default ${isActive ? 'bg-white/10' : 'bg-white/5'} transition-colors`}
         >
           <div className="text-xs font-medium tracking-widest text-white/40 uppercase flex items-center gap-2">
             <div 

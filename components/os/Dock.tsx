@@ -14,7 +14,12 @@ interface DockProps {
 }
 
 export const Dock: React.FC<DockProps> = ({ onNexusClick }) => {
-  const { windows, activeWindowId, focusWindow, minimizeWindow, restoreWindow, openWindow } = useWindowManager();
+  const windows = useWindowManager((state) => state.windows);
+  const activeWindowId = useWindowManager((state) => state.activeWindowId);
+  const focusWindow = useWindowManager((state) => state.focusWindow);
+  const minimizeWindow = useWindowManager((state) => state.minimizeWindow);
+  const restoreWindow = useWindowManager((state) => state.restoreWindow);
+  const openWindow = useWindowManager((state) => state.openWindow);
   const { accentColor } = useSettingsStore();
   const [isHovering, setIsHovering] = useState(false);
 
@@ -75,11 +80,11 @@ export const Dock: React.FC<DockProps> = ({ onNexusClick }) => {
       >
         
         {/* LEFT DECK: Apps & Nexus */}
-        <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 pl-3 shadow-2xl flex items-center gap-3 transition-all duration-300 hover:bg-slate-900/90 hover:scale-[1.01]">
+        <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 pl-3 shadow-2xl flex items-center gap-3 transition-all duration-300 hover:bg-slate-900/90 hover:scale-[1.01] hover:border-white/20">
             {/* Nexus Button */}
             <button 
                 onClick={onNexusClick}
-                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all active:scale-95 group"
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/15 flex items-center justify-center transition-all active:scale-95 group"
                 style={{ color: accentColor }}
                 title="Open Nexus"
             >
@@ -91,8 +96,9 @@ export const Dock: React.FC<DockProps> = ({ onNexusClick }) => {
             {/* App Icons */}
             <div className="flex items-center gap-1">
                 {taskbarApps.map((id) => {
-                    const isOpen = Object.values(windows).some(w => w.appId === id);
-                    const isActive = Object.values(windows).some(w => w.appId === id && w.id === activeWindowId && !w.isMinimized);
+                  const relatedWindows = Object.values(windows).filter(w => w.appId === id);
+                  const isOpen = relatedWindows.length > 0;
+                  const isActive = relatedWindows.some(w => w.id === activeWindowId && !w.isMinimized);
 
                     return (
                     <div key={id} className="relative flex flex-col items-center justify-center h-full px-1 group">
@@ -101,6 +107,8 @@ export const Dock: React.FC<DockProps> = ({ onNexusClick }) => {
                             title={APP_REGISTRY[id].title} 
                             icon={APP_REGISTRY[id].icon} 
                             color="bg-transparent" 
+                      isActive={isActive}
+                      accentColor={accentColor}
                             onClick={() => handleTaskbarClick(id)}
                         />
                         

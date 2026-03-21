@@ -3,7 +3,7 @@ import React from 'react';
 import { 
     Terminal, FileText, Share2, Sparkles, Activity, Bot, 
     Calculator, Calendar, Camera, Clock, FolderOpen, Settings,
-    Grid, Presentation, PenTool
+    Grid, PenTool
 } from 'lucide-react';
 import { AppConfig, AppId } from '../types';
 
@@ -24,7 +24,6 @@ const SettingsApp = React.lazy(() => import('../components/apps/Settings'));
 // New Office Suite
 const Scribe = React.lazy(() => import('../components/apps/Scribe/Editor'));
 const AetherGrid = React.lazy(() => import('../components/apps/Grid/VirtualSheet'));
-const Slides = React.lazy(() => import('../components/apps/Slides/SlideDeck'));
 
 export const APP_REGISTRY: Record<AppId, AppConfig> = {
     'terminal': {
@@ -56,14 +55,6 @@ export const APP_REGISTRY: Record<AppId, AppConfig> = {
         title: 'Aether Grid',
         icon: <Grid size={20} />,
         component: AetherGrid,
-        defaultWidth: 1000,
-        defaultHeight: 600
-    },
-    'slides': {
-        id: 'slides',
-        title: 'Aether Slides',
-        icon: <Presentation size={20} />,
-        component: Slides,
         defaultWidth: 1000,
         defaultHeight: 600
     },
@@ -158,8 +149,6 @@ export const getAppIdForExtension = (filename: string): AppId => {
         case 'csv':
         case 'grid':
             return 'grid';
-        case 'pres':
-            return 'slides';
         case 'png':
         case 'jpg':
         case 'jpeg':

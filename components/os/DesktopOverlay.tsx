@@ -104,12 +104,12 @@ export const DesktopOverlay = () => {
             transition={{ duration: 1.5, delay: 0.5 }}
             className="flex flex-col items-center"
          >
-            <p className="text-lg md:text-xl font-light tracking-[0.4em] text-white/60 uppercase mb-2">
+            <p className="text-xl md:text-3xl font-bold tracking-[0.18em] text-white/80 uppercase mb-1 leading-none">
                 As long as I live
             </p>
             <div className="flex items-center gap-4">
                 <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-white/20" />
-                <p className="text-sm font-serif italic text-white/40">
+                <p className="text-xs md:text-sm font-semibold tracking-[0.16em] uppercase text-white/55 leading-none">
                     there are
                 </p>
                 <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-white/20" />
@@ -142,12 +142,12 @@ export const DesktopOverlay = () => {
 
          <motion.h1
             initial={{ opacity: 0, letterSpacing: '0em', y: 20 }}
-            animate={{ opacity: 1, letterSpacing: '0.3em', y: 0 }}
+                animate={{ opacity: 1, letterSpacing: '0.16em', y: 0 }}
             transition={{ duration: 1.5, delay: 1.8, ease: "easeOut" }}
-            className="text-4xl md:text-6xl font-bold text-white/90"
-            style={{ textShadow: '0 10px 40px rgba(0,0,0,0.5)' }}
+                className="text-6xl md:text-8xl font-black text-white/95 leading-none"
+                style={{ textShadow: '0 12px 36px rgba(0,0,0,0.45)' }}
          >
-            POSSIBILITIES
+                        POSSIBILITIES
          </motion.h1>
       </div>
     </div>
