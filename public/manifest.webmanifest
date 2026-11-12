@@ -1,0 +1,10 @@
+{
+  "name": "AetherOS",
+  "short_name": "AetherOS",
+  "description": "A private, encrypted, local-first operating system for the web.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0d14",
+  "theme_color": "#0b0d14",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -1,194 +1,143 @@
 <div align="center">
 
-# AetherOS
-### Weightless Computing for the Web
+# AetherOS 2.0 — *Halcyon*
 
-<img src="public/assets/Desktop.png" width="100%" alt="AetherOS Desktop" />
+### The private operating system that lives in a browser tab.
 
-<br/>
+Encrypted by default · local-first · zero telemetry · extensible with sandboxed apps
 
-[![React](https://img.shields.io/badge/React-18.2-61DAFB?logo=react&logoColor=0B1020)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.x-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Three.js](https://img.shields.io/badge/Three.js-WebGL-black?logo=three.js&logoColor=white)](https://threejs.org/)
-[![Framer Motion](https://img.shields.io/badge/Framer_Motion-10.x-0055FF?logo=framer&logoColor=white)](https://www.framer.com/motion/)
-[![Zustand](https://img.shields.io/badge/Zustand-State_Engine-6D4AFF)](https://zustand.docs.pmnd.rs/)
-[![Build](https://img.shields.io/badge/Build-Passing-00C853)](#quick-start)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=0B1020)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Crypto](https://img.shields.io/badge/WebCrypto-AES--256--GCM-10b981)](#security-model)
 [![License](https://img.shields.io/badge/License-MIT-22c55e)](#license)
 
 </div>
 
 ---
 
-## ✨ What is AetherOS?
+AetherOS turns any modern browser into a complete, private desktop. Every file, note, password, event and setting is **encrypted on-device with AES-256-GCM** before it touches storage. There are no accounts, no servers and no analytics — and a strict Content-Security-Policy makes it technically impossible for the OS or any app inside it to send your data anywhere.
 
-AetherOS is a browser-native WebOS that turns a tab into a full desktop-like runtime.
-It blends immersive visuals, persistent state, and practical built-in apps into a cohesive operating experience.
+It's designed to be the thing you'd actually trust with your life admin, and a platform others can build on.
 
-This is not a static dashboard. It is an **OS-style interaction model** with process-like windows, app lifecycle behavior, shell surfaces, and storage-backed workflows.
+## Highlights
 
----
-
-## 🚀 Why It Stands Out
-
-- **Real windowing model**: draggable windows, focus stack, minimize/maximize, restore, and docking interactions.
-- **Persistent virtual filesystem**: app data survives sessions with worker-backed storage behavior.
-- **Living shell**: glass UI + spatial/3D background + adaptive rendering quality.
-- **App-native workflows**: editors, terminal, monitor, camera, time suite, AI assistant, file explorer.
-- **Production-grade UX decisions**: explicit enter/exit routes for mode-heavy experiences, safe fallback paths, and resilient overlays.
-
----
-
-## 🧩 Feature Showcase
-
-### 🖥️ WebOS Shell
-- Dock with active process indicators and launch controls.
-- Nexus launcher for app + file discovery.
-- Context menus and notification center.
-- System tray with live device/context signals.
-
-### 🌌 Visual + Motion System
-- 3D wallpaper via React Three Fiber.
-- Shared motion primitives for interaction consistency.
-- Eco mode + reduced-motion aware behavior.
-- Accent-based theming and glass depth system.
-
-### 🗂️ Data + Runtime
-- Zustand-powered state kernel.
-- IndexedDB/worker-backed filesystem model.
-- Recursive-safe delete and parent path materialization.
-- Lazy app loading for startup responsiveness.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
+| | |
 |---|---|
-| UI Runtime | React 18, TypeScript |
-| Build System | Vite |
-| Motion | Framer Motion |
-| 3D | Three.js, @react-three/fiber, @react-three/drei |
-| Charts | Recharts |
-| State | Zustand |
-| Storage | IndexedDB + LocalStorage + Worker bridge |
-| AI Runtime | @mlc-ai/web-llm (with safe-mode fallback) |
+| 🔐 **Encrypted vault** | AES-256-GCM per record, 600k-round PBKDF2 passphrase or non-extractable device key, brute-force throttling, auto-lock, instant key rotation |
+| 🛡️ **Shield privacy center** | Privacy score with one-click fixes, per-app permissions, sensor & access audit log, live network transparency log, raw-ciphertext viewer |
+| 🪟 **Real window manager** | Drag, 8-way resize, edge & quarter snapping with previews, 4 workspaces, overview (Alt O), Alt-Tab switcher, session restore |
+| 🔎 **Spotlight** (Ctrl K) | Fuzzy search over apps, commands, file names *and decrypted file contents*, inline calculator, ask-Cortex fallback |
+| 🧩 **App platform** | Install sandboxed HTML apps (`.aetherapp`), capability-based SDK, permission prompts, built in Code with one-click install |
+| 🤖 **On-device AI** | Cortex: instant offline intent engine + optional WebGPU LLMs (Qwen, Llama, Phi, SmolLM) — prompts never leave the device |
+| 👻 **Guest sessions** | RAM-only sessions that vanish completely when you exit |
+| 💾 **Portable backups** | Single password-encrypted `.aether` file, restorable anywhere (merge or replace) |
 
----
+## The app suite (19 built-in apps)
 
-## 📱 App Suite (Current)
+**Productivity** — Notes (Markdown, notebooks, live preview, clickable checklists) · Calendar (month/week/agenda, reminders, `.ics` import/export) · Tasks (Kanban + list, boards, subtasks) · Sheets (formula engine, ranges, CSV) · Cortex (AI)
 
-### Productivity
-- **Aether Text** — markdown-friendly writing, open/new/save/save-as workflows.
-- **Aether Scribe** — focus writing, formatting tools, export behavior, mode exit controls.
-- **Aether Grid** — virtualized sheet model, formulas, and file lifecycle actions.
-- **Aether Files** — searchable filesystem explorer with sorting, breadcrumbs, create/delete.
+**Privacy** — Keychain (password manager with RFC-6238 2FA codes, generator, offline security audit, CSV import) · Shield (privacy center)
 
-### Utility + System
-- **Terminal** — command shell + sandboxed JS REPL + app/file bridge commands.
-- **System Monitor** — CPU/memory telemetry simulation + process metrics + uptime/FPS cards.
-- **Chronos** — clock, stopwatch, timer, and alarm utilities.
-- **Settings** — appearance, performance, motion, and storage controls.
+**Developer** — Code (CodeMirror 6, tabs, file tree, sandboxed JS runner, live HTML/Markdown preview, install-as-app) · Terminal (real shell: pipes, redirects, `&&`, globs, env vars, tab completion, 50+ commands incl. `seal`/`unseal` file encryption)
 
-### Intelligence + Media
-- **Cortex AI** — local AI assistant surface with app/file tool interactions.
-- **Lens** — camera app with filter pipeline, capture flow, and mirror correction.
-- **Wormhole / Image Filter / Abacus / Epoch** — specialized utility applications.
+**Media & Creativity** — Photos (library, viewer, editor; strips GPS/EXIF) · Media (audio/video, visualizer, media keys) · Canvas (paint: brushes, shapes, flood fill, eyedropper, text) · Camera (permission-gated, live in-use indicator, photo/video)
 
-> Note: **Aether Slides** has been removed from the suite.
+**System & Utilities** — Files (multi-select, drag & drop, preview pane, trash, starred, checksum, password-seal) · Settings · App Center · Monitor (real FPS, main-thread latency, heap, storage, processes) · Clock (world, alarms, stopwatch, timers, Pomodoro focus with auto-DND) · Calculator (basic/scientific/programmer)
 
----
+## Security model
 
-## 🧠 Architecture Overview
+```
+passphrase ──PBKDF2-SHA256 (600k, 128-bit salt)──► KEK ──AES-GCM wrap──► DEK (random 256-bit)
+                                                                            │
+          IndexedDB:  vault:header  (wrapped DEK, salt — no plaintext)      │ AES-256-GCM, random 96-bit IV,
+                      fs:index      (encrypted directory tree)  ◄───────────┤ record-bound associated data
+                      blob:<rand>   (encrypted file contents)   ◄───────────┘
+```
 
-### 1) Kernel Layer (State + Persistence)
-- `store/useWindowManager.ts`
-- `store/useFileSystem.ts`
-- `stores/settingsStore.ts`
+- **Zero-knowledge at rest.** File names, folder structure and contents are all ciphertext. Blob keys are random IDs, so storage reveals nothing about what you keep.
+- **Associated data binding** prevents swapping or replaying encrypted records between keys.
+- **Key rotation is instant** — changing your passphrase only re-wraps the DEK.
+- **Locking** unmounts every app, drops decrypted caches and forgets the key.
+- **Throttling** — repeated wrong passphrases trigger exponential lockouts.
+- **CSP (production build)** restricts `connect-src`, `img-src` and `form-action` so neither the OS nor sandboxed apps can exfiltrate data. The only allowed external hosts are the model mirrors used when *you* opt in to downloading an AI model.
+- **Remote images in Markdown are blocked** (no tracking pixels); external links require confirmation and never send a referrer.
+- **Clipboard hygiene** — copied secrets are auto-cleared.
 
-### 2) Shell Layer (OS Surfaces)
-- `components/os/WindowManager.tsx`
-- `components/os/WindowFrame.tsx`
-- `components/os/Dock.tsx`
-- `components/os/Nexus.tsx`
-- `components/os/SystemTray.tsx`
-- `components/os/ContextMenu.tsx`
-- `components/os/NotificationCenter.tsx`
+**Threat model:** protects data at rest (copied browser profiles, stolen disks, other software reading storage). While unlocked, data is decrypted in the tab's memory; a compromised browser or OS is out of scope for any web app.
 
-### 3) Experience Layer (3D + Theme)
-- `components/3d/WallpaperEngine.tsx`
-- `components/3d/DesktopWidgets.tsx`
-- `hooks/useTheme.ts`
-- `utils/MotionConfig.ts`
+## Building apps for AetherOS
 
-### 4) App Registry Layer
-- `utils/appRegistry.tsx`
+An app is one HTML document plus a manifest:
 
----
+```json
+{
+  "id": "my-app",
+  "name": "My App",
+  "icon": "🚀",
+  "color": "#6366f1",
+  "permissions": ["notifications", "storage"],
+  "html": "<button onclick=\"aether.notify('Hi!')\">Hello</button>"
+}
+```
 
-## ⚡ Quick Start
+Apps run in an opaque-origin `sandbox="allow-scripts"` iframe and talk to the OS only through `window.aether`:
 
-### Prerequisites
-- Node.js 18+
-- npm 9+
+| API | Permission |
+|---|---|
+| `aether.notify(title, body?)` | `notifications` |
+| `aether.clipboard.write(text)` | `clipboard` |
+| `aether.storage.get / set / remove / keys` | — (private, encrypted, 2 MB) |
+| `aether.fs.open({extensions})`, `aether.fs.save(name, content)` | `files` (user picks) |
+| `aether.fs.read / write / list(path)` | `files` (runtime consent) |
+| `aether.setTitle()`, `aether.theme()`, `aether.on('theme', fn)` | — |
 
-### Run Locally
+Every call is checked against the manifest *and* user consent, and logged in Shield. Write one in **Code**, hit *Preview*, then *Install as app*.
+
+## Keyboard
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl K` / `Alt Space` | Spotlight |
+| `Alt Tab` / ``Alt ` `` | Switch windows |
+| `Alt O` | Overview |
+| `Alt ← → ↑ ↓` | Snap / maximize / minimize |
+| `Alt 1–4`, `Alt Shift 1–4` | Switch / move to workspace |
+| `Alt L` | Lock |
+| `Alt /` | All shortcuts |
+
+## Quick start
 
 ```bash
 npm install
-npm run dev
-```
-
-### Production Build
-
-```bash
-npm run build
+npm run dev        # http://localhost:3000
+npm run build      # type-checks, then builds to dist/ with the strict CSP
 npm run preview
 ```
 
----
+Requires a modern Chromium, Firefox or Safari. On-device AI chat requires WebGPU (Chrome/Edge 113+).
 
-## 📁 Project Structure
+## Architecture
 
 ```text
-components/
-  3d/              # Wallpaper + spatial visuals
-  apps/            # App modules
-  os/              # Shell, launcher, tray, windowing surfaces
-store/             # Core stores (filesystem, window manager)
-stores/            # Settings store
-services/          # Service layer (e.g., Cortex)
-utils/             # Registry, backup, security, motion config
-workers/           # Worker runtime for persistence/compute
+src/
+  kernel/   crypto · db · vault · vfs · session · windows · settings · appdata
+            privacy (permissions, sensors, network log) · scheduler · launcher · backup · registry
+  shell/    Boot · Setup · LockScreen · Desktop · TopBar · Dock · WindowFrame · WindowLayer
+            Spotlight · Launchpad · NotificationCenter · QuickSettings · Dialogs · Widgets · Wallpaper (WebGL)
+  apps/     19 built-in apps
+  sdk/      sandbox runtime · manifest validation · built-in catalog
+  ui/       design system primitives (light & dark tokens)
+  lib/      path · mime · calc (safe evaluator) · markdown · strength · totp · sound
 ```
 
----
+Upgrading from v1? The setup wizard detects your old unencrypted files, imports them into the encrypted vault, and removes the plaintext copy.
 
-## 🧭 Roadmap
+## Author
 
-- Stronger multi-document workflows in editor apps
-- Richer process/session recovery behavior
-- More robust app permission and capability boundaries
-- Better chunking for very heavy modules (AI/3D)
-- Additional production hardening and diagnostics surfaces
+**Ram Sharma** — Creative Technologist · Full-Stack Builder · Systems UI Enthusiast
+[GitHub](https://github.com/sharmaram25) · [Portfolio](https://portfolio-ram-sharma.netlify.app/)
 
----
-
-## 👨‍💻 Author
-
-**Ram Sharma**  
-Creative Technologist · Full-Stack Builder · Systems UI Enthusiast
-
-> "Working to solve problems one code commit at a time."
-
-AetherOS is part product exploration, part engineering lab, and part design statement for web-native operating environments.
-
-### Connect
-- GitHub: [https://github.com/sharmaram25](https://github.com/sharmaram25)
-- Portfolio: [https://portfolio-ram-sharma.netlify.app/](https://portfolio-ram-sharma.netlify.app/)
-
----
-
-## 📜 License
+## License
 
 MIT
